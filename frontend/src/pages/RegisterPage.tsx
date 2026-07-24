@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, User as UserIcon, UserPlus, AlertCircle, ChevronDown, ChevronUp, Globe, Sparkles, Check, Upload, Image, Link as LinkIcon } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, UserPlus, AlertCircle, ChevronDown, ChevronUp, Globe, Sparkles, Check, Upload, Link as LinkIcon, PlayCircle } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { ApiService } from '../services/api';
 import { soundManager } from '../utils/audio';
@@ -42,7 +42,7 @@ export const RegisterPage: React.FC = () => {
   const [showOptionalProfile, setShowOptionalProfile] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState(TOY_AVATARS[0].url);
   const [customAvatarUrl, setCustomAvatarUrl] = useState('');
-  const [country, setCountry] = useState('US');
+  const [country, setCountry] = useState('IN');
   const [bio, setBio] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -66,8 +66,8 @@ export const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !email || !password) {
-      setError('Please fill in all required fields.');
+    if (!username.trim() || !password.trim()) {
+      setError('Please enter a username and password.');
       return;
     }
     setError('');
@@ -77,15 +77,15 @@ export const RegisterPage: React.FC = () => {
     const finalAvatar = customAvatarUrl.trim() || selectedAvatar;
 
     try {
-      const res = await ApiService.register(email, username, password, {
+      const res = await ApiService.register(email.trim(), username.trim(), password, {
         avatarUrl: finalAvatar,
         country,
         bio,
       });
-      register(email, username, res.token, res.user);
+      register(email.trim(), username.trim(), res.token, res.user);
       navigate('/dashboard');
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -103,22 +103,22 @@ export const RegisterPage: React.FC = () => {
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-500 to-violet-600 mx-auto flex items-center justify-center font-black text-xl text-white shadow-lg shadow-brand-500/30">
             9
           </div>
-          <h2 className="font-display font-black text-2xl text-white">Create Account</h2>
-          <p className="text-xs text-slate-400">Join thousands of Sudoku solvers worldwide</p>
+          <h2 className="font-display font-black text-2xl text-slate-900 dark:text-white">Create Account</h2>
+          <p className="text-xs text-slate-600 dark:text-slate-400">Save scores to Global Leaderboard or play as guest</p>
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{error}</span>
+          <div className="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-700 dark:text-rose-300 text-xs flex items-center space-x-2.5">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-500" />
+            <span className="font-semibold">{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Username */}
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5">
-              Username <span className="text-brand-400">*</span>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+              Username <span className="text-brand-500">*</span>
             </label>
             <div className="relative">
               <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -127,34 +127,33 @@ export const RegisterPage: React.FC = () => {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                placeholder="SudokuMaster99"
+                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
+                placeholder="bhanuprakash"
               />
             </div>
           </div>
 
           {/* Email */}
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5">
-              Email Address <span className="text-brand-400">*</span>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+              Email Address (Optional)
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                placeholder="name@example.com"
+                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
+                placeholder="bhanuprakash.gandham12@gmail.com"
               />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5">
-              Password <span className="text-brand-400">*</span>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+              Password <span className="text-brand-500">*</span>
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -163,24 +162,24 @@ export const RegisterPage: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
                 placeholder="••••••••"
               />
             </div>
           </div>
 
           {/* OPTIONAL PROFILE DETAILS TOGGLE */}
-          <div className="pt-2 border-t border-slate-800">
+          <div className="pt-2 border-t border-slate-300 dark:border-slate-800">
             <button
               type="button"
               onClick={() => {
                 soundManager.playClick();
                 setShowOptionalProfile(!showOptionalProfile);
               }}
-              className="w-full py-2 px-3 rounded-xl bg-slate-900/60 hover:bg-slate-800 text-xs font-semibold text-brand-300 border border-slate-800 flex items-center justify-between transition-colors"
+              className="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-semibold text-brand-600 dark:text-brand-300 border border-slate-300 dark:border-slate-800 flex items-center justify-between transition-colors"
             >
               <span className="flex items-center space-x-2">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 <span>Customize Avatar & Profile (Optional)</span>
               </span>
               {showOptionalProfile ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -197,13 +196,13 @@ export const RegisterPage: React.FC = () => {
                   {/* Avatar Picker & Device Upload */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <label className="text-[11px] font-semibold text-slate-400 block">
+                      <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block">
                         Choose Avatar or Upload Image
                       </label>
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="text-[10px] font-bold text-brand-400 hover:text-brand-300 flex items-center space-x-1 bg-brand-500/10 px-2 py-1 rounded-lg border border-brand-500/30"
+                        className="text-[10px] font-bold text-brand-600 dark:text-brand-400 hover:text-brand-500 flex items-center space-x-1 bg-brand-500/10 px-2 py-1 rounded-lg border border-brand-500/30"
                       >
                         <Upload className="w-3 h-3" />
                         <span>Upload from Laptop/Mobile</span>
@@ -229,8 +228,8 @@ export const RegisterPage: React.FC = () => {
                           }}
                           className={`relative cursor-pointer rounded-xl overflow-hidden aspect-square border-2 transition-all ${
                             selectedAvatar === av.url && !customAvatarUrl
-                              ? 'border-brand-400 ring-2 ring-brand-500/40 scale-105'
-                              : 'border-slate-800 hover:border-slate-600'
+                              ? 'border-brand-500 ring-2 ring-brand-500/40 scale-105'
+                              : 'border-slate-300 dark:border-slate-800 hover:border-slate-500'
                           }`}
                         >
                           <img src={av.url} alt={av.name} className="w-full h-full object-cover" />
@@ -256,7 +255,7 @@ export const RegisterPage: React.FC = () => {
                           setCustomAvatarUrl(e.target.value);
                           if (e.target.value) setSelectedAvatar(e.target.value);
                         }}
-                        className="w-full glass-input pl-9 pr-3 py-1.5 rounded-xl text-[11px] text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                        className="w-full glass-input pl-9 pr-3 py-1.5 rounded-xl text-[11px] placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
                         placeholder="Or paste any avatar Image URL..."
                       />
                     </div>
@@ -264,7 +263,7 @@ export const RegisterPage: React.FC = () => {
 
                   {/* Country Selector */}
                   <div>
-                    <label className="text-[11px] font-semibold text-slate-400 block mb-1.5">
+                    <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1.5">
                       Country / Region (Optional)
                     </label>
                     <div className="relative">
@@ -272,10 +271,10 @@ export const RegisterPage: React.FC = () => {
                       <select
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
-                        className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-900"
+                        className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white dark:bg-slate-900"
                       >
                         {COUNTRIES.map((c) => (
-                          <option key={c.code} value={c.code} className="bg-slate-950 text-slate-100">
+                          <option key={c.code} value={c.code} className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
                             {c.name} ({c.code})
                           </option>
                         ))}
@@ -285,14 +284,14 @@ export const RegisterPage: React.FC = () => {
 
                   {/* Bio */}
                   <div>
-                    <label className="text-[11px] font-semibold text-slate-400 block mb-1.5">
+                    <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1.5">
                       Short Bio (Optional)
                     </label>
                     <textarea
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
                       rows={2}
-                      className="w-full glass-input p-3 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+                      className="w-full glass-input p-3 rounded-xl text-xs placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
                       placeholder="Share your Sudoku goals or solving style..."
                     />
                   </div>
@@ -312,10 +311,31 @@ export const RegisterPage: React.FC = () => {
           </button>
         </form>
 
+        {/* Divider */}
+        <div className="relative flex items-center justify-center my-4">
+          <div className="border-t border-slate-300 dark:border-slate-800 w-full" />
+          <span className="bg-slate-50 dark:bg-slate-950 px-3 text-[10px] font-mono text-slate-500 uppercase absolute">
+            OR PLAY WITHOUT ACCOUNT
+          </span>
+        </div>
+
+        {/* Play as Guest Button */}
+        <button
+          type="button"
+          onClick={() => {
+            soundManager.playClick();
+            navigate('/play');
+          }}
+          className="w-full py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center justify-center space-x-2 border border-slate-300 dark:border-slate-800 shadow-sm transition-all"
+        >
+          <PlayCircle className="w-4 h-4 text-emerald-500" />
+          <span>Continue as Guest (Play Now)</span>
+        </button>
+
         {/* Footer link */}
-        <p className="text-center text-xs text-slate-400 pt-2">
+        <p className="text-center text-xs text-slate-600 dark:text-slate-400 pt-2">
           Already registered?{' '}
-          <Link to="/login" className="text-brand-400 font-semibold hover:underline">
+          <Link to="/login" className="text-brand-500 font-semibold hover:underline">
             Log In
           </Link>
         </p>

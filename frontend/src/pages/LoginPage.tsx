@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, LogIn, Chrome, CheckSquare, Square, AlertCircle } from 'lucide-react';
+import { Mail, Lock, LogIn, CheckSquare, Square, AlertCircle, PlayCircle } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { ApiService } from '../services/api';
 import { soundManager } from '../utils/audio';
@@ -50,7 +50,7 @@ export const LoginPage: React.FC = () => {
             9
           </div>
           <h2 className="font-display font-black text-2xl text-slate-900 dark:text-white">Welcome Back</h2>
-          <p className="text-xs text-slate-600 dark:text-slate-400">Log in to resume your Sudoku games & track stats</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400">Log in to sync your stats or play immediately as guest</p>
         </div>
 
         {error && (
@@ -121,6 +121,27 @@ export const LoginPage: React.FC = () => {
             <span>{loading ? 'Logging in...' : 'Sign In'}</span>
           </button>
         </form>
+
+        {/* Divider */}
+        <div className="relative flex items-center justify-center my-4">
+          <div className="border-t border-slate-300 dark:border-slate-800 w-full" />
+          <span className="bg-slate-50 dark:bg-slate-950 px-3 text-[10px] font-mono text-slate-500 uppercase absolute">
+            OR PLAY WITHOUT ACCOUNT
+          </span>
+        </div>
+
+        {/* Play as Guest Button */}
+        <button
+          type="button"
+          onClick={() => {
+            soundManager.playClick();
+            navigate('/play');
+          }}
+          className="w-full py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center justify-center space-x-2 border border-slate-300 dark:border-slate-800 shadow-sm transition-all"
+        >
+          <PlayCircle className="w-4 h-4 text-emerald-500" />
+          <span>Continue as Guest (Play Now)</span>
+        </button>
 
         {/* Footer link */}
         <p className="text-center text-xs text-slate-600 dark:text-slate-400 pt-2">

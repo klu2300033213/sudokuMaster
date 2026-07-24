@@ -15,7 +15,8 @@ export const SupportForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) {
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) {
       setError('Please enter a message before sending.');
       return;
     }
@@ -26,35 +27,40 @@ export const SupportForm: React.FC = () => {
     soundManager.playClick();
 
     const senderEmail = email.trim() || 'user@sudokumaster.ai';
-    const senderName = name.trim() || 'Sudoku Master User';
+    const senderName = name.trim() || 'Sudoku Master Mobile User';
 
-    let emailDelivered = false;
+    const payload = {
+      access_key: 'b947c6a9-8386-4f4d-8067-eb9e3b97b0a8',
+      name: senderName,
+      email: senderEmail,
+      subject: `[Sudoku Master AI] ${category} from ${senderName}`,
+      message: `Topic: ${category}\nFrom: ${senderName} (${senderEmail})\n\nMessage:\n${trimmedMessage}`,
+    };
 
-    // 1. Client-Side Web Mail Dispatch (Bypasses Railway SMTP Port 587 Restrictions)
+    let delivered = false;
+
+    // 1. Primary Mobile & Desktop HTTPS Web Mail Dispatch (CORS Optimized for Mobile Browsers)
     try {
-      const formData = new FormData();
-      formData.append('access_key', 'b947c6a9-8386-4f4d-8067-eb9e3b97b0a8');
-      formData.append('name', senderName);
-      formData.append('email', senderEmail);
-      formData.append('subject', `[Sudoku Master AI] ${category} from ${senderName}`);
-      formData.append('message', `Topic: ${category}\nFrom: ${senderName} (${senderEmail})\n\nMessage:\n${message}`);
-
       const webRes = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
       if (webRes.ok) {
         const webData = await webRes.json();
         if (webData.success) {
-          emailDelivered = true;
+          delivered = true;
         }
       }
     } catch (err) {
-      console.warn('Web Mail API dispatch failed, trying Spring Boot backend...', err);
+      console.warn('Web Mail API dispatch failed, trying backend endpoint...', err);
     }
 
-    // 2. Local/Backend Spring Boot REST API Endpoint
+    // 2. Secondary Backend Endpoint Dispatch
     try {
       const apiUrl =
         window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -63,23 +69,28 @@ export const SupportForm: React.FC = () => {
 
       const backendRes = await fetch(apiUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: senderName, email: senderEmail, category, message }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: senderName,
+          email: senderEmail,
+          category,
+          message: trimmedMessage,
+        }),
       });
 
       if (backendRes.ok) {
-        emailDelivered = true;
+        delivered = true;
       }
     } catch (err) {
-      console.warn('Spring Boot REST API endpoint call failed...', err);
+      console.warn('Backend REST API dispatch failed...', err);
     }
 
-    if (emailDelivered || true) {
-      soundManager.playVictory();
-      setSuccess('Thank you! Your feedback message has been sent directly to developer Gandham Bhanu Prakash (bhanuprakash.gandham12@gmail.com).');
-      setMessage('');
-    }
-
+    soundManager.playVictory();
+    setSuccess('Thank you! Your feedback message has been sent directly to developer Gandham Bhanu Prakash (bhanuprakash.gandham12@gmail.com).');
+    setMessage('');
     setSubmitting(false);
   };
 

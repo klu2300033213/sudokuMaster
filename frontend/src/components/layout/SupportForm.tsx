@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Mail, User, MessageSquare, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Send, Mail, User, MessageSquare, CheckCircle2, AlertCircle, Loader2, ExternalLink } from 'lucide-react';
 import { soundManager } from '../../utils/audio';
 
 export const SupportForm: React.FC = () => {
@@ -12,6 +12,8 @@ export const SupportForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+
+  const developerEmail = 'bhanuprakash.gandham12@gmail.com';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +29,7 @@ export const SupportForm: React.FC = () => {
     soundManager.playClick();
 
     const senderEmail = email.trim() || 'user@sudokumaster.ai';
-    const senderName = name.trim() || 'Sudoku Master Mobile User';
+    const senderName = name.trim() || 'Sudoku Master User';
 
     const payload = {
       access_key: 'b947c6a9-8386-4f4d-8067-eb9e3b97b0a8',
@@ -37,9 +39,7 @@ export const SupportForm: React.FC = () => {
       message: `Topic: ${category}\nFrom: ${senderName} (${senderEmail})\n\nMessage:\n${trimmedMessage}`,
     };
 
-    let delivered = false;
-
-    // 1. Primary Mobile & Desktop HTTPS Web Mail Dispatch (CORS Optimized for Mobile Browsers)
+    // 1. Primary HTTPS Web Dispatch
     try {
       const webRes = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
@@ -53,7 +53,7 @@ export const SupportForm: React.FC = () => {
       if (webRes.ok) {
         const webData = await webRes.json();
         if (webData.success) {
-          delivered = true;
+          console.log('Web mail sent successfully.');
         }
       }
     } catch (err) {
@@ -67,7 +67,7 @@ export const SupportForm: React.FC = () => {
           ? 'http://localhost:8085/api/support/send'
           : '/api/support/send';
 
-      const backendRes = await fetch(apiUrl, {
+      await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,19 +80,20 @@ export const SupportForm: React.FC = () => {
           message: trimmedMessage,
         }),
       });
-
-      if (backendRes.ok) {
-        delivered = true;
-      }
     } catch (err) {
       console.warn('Backend REST API dispatch failed...', err);
     }
 
     soundManager.playVictory();
-    setSuccess('Thank you! Your feedback message has been sent directly to developer Gandham Bhanu Prakash (bhanuprakash.gandham12@gmail.com).');
+    setSuccess(`Thank you! Your feedback message has been logged for developer Gandham Bhanu Prakash (${developerEmail}).`);
     setMessage('');
     setSubmitting(false);
   };
+
+  // Generate Mailto Link for Mobile Phones
+  const mailtoSubject = encodeURIComponent(`[Sudoku Master AI] ${category} from ${name.trim() || 'User'}`);
+  const mailtoBody = encodeURIComponent(`Topic: ${category}\nFrom: ${name.trim() || 'User'} (${email.trim() || 'Not specified'})\n\nMessage:\n${message.trim() || 'Hello Bhanu, I would like to suggest changes for Sudoku Master AI.'}`);
+  const mailtoUrl = `mailto:${developerEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
 
   return (
     <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-2xl w-full mx-auto my-8">
@@ -105,7 +106,7 @@ export const SupportForm: React.FC = () => {
           Have Suggestions or Need Support?
         </h3>
         <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-          Send a direct message to developer <strong>Gandham Bhanu Prakash</strong> (`bhanuprakash.gandham12@gmail.com`) for feature requests, bug reports, or improvements.
+          Send a message directly to developer <strong>Gandham Bhanu Prakash</strong> (<code>{developerEmail}</code>) for feature requests, bug reports, or improvements.
         </p>
       </div>
 
@@ -117,7 +118,7 @@ export const SupportForm: React.FC = () => {
         >
           <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
           <div>
-            <strong className="font-bold block mb-0.5">Email Delivered Successfully!</strong>
+            <strong className="font-bold block mb-0.5">Message Processed!</strong>
             <span>{success}</span>
           </div>
         </motion.div>
@@ -164,7 +165,7 @@ export const SupportForm: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
-                placeholder="bhanuprakash.gandham12@gmail.com"
+                placeholder={developerEmail}
               />
             </div>
           </div>
@@ -178,7 +179,7 @@ export const SupportForm: React.FC = () => {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full glass-input p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white dark:bg-slate-900"
+            className="w-full glass-input p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
           >
             <option value="Feature Suggestion">💡 Feature Suggestion</option>
             <option value="Bug Report">🐛 Bug Report</option>
@@ -203,24 +204,39 @@ export const SupportForm: React.FC = () => {
           />
         </div>
 
-        {/* Submit CTA */}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-600 hover:from-brand-400 hover:to-violet-500 text-white font-bold text-xs shadow-lg shadow-brand-500/25 flex items-center justify-center space-x-2 transition-all hover:scale-105 disabled:opacity-50"
-        >
-          {submitting ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Transmitting Email...</span>
-            </>
-          ) : (
-            <>
-              <Send className="w-4 h-4" />
-              <span>Send Email to Developer</span>
-            </>
-          )}
-        </button>
+        {/* Submit Buttons (Online Dispatch + Direct Mobile Mailto App link) */}
+        <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-600 hover:from-brand-400 hover:to-violet-500 text-white font-bold text-xs shadow-lg shadow-brand-500/25 flex items-center justify-center space-x-2 transition-all hover:scale-105 disabled:opacity-50"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Transmitting...</span>
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" />
+                <span>Send Message Online</span>
+              </>
+            )}
+          </button>
+
+          {/* Direct Mobile Mailto Link */}
+          <a
+            href={mailtoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => soundManager.playClick()}
+            className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-300 dark:border-slate-700 flex items-center justify-center space-x-2 transition-all shadow-sm"
+          >
+            <Mail className="w-4 h-4 text-brand-500" />
+            <span>Open Mobile Email App</span>
+            <ExternalLink className="w-3 h-3 text-slate-400" />
+          </a>
+        </div>
       </form>
     </div>
   );

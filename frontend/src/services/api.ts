@@ -1,4 +1,4 @@
-import { Achievement, LeaderboardEntry, User, UserStats } from '../types';
+import { Achievement, LeaderboardEntry, User } from '../types';
 
 const API_BASE_URL = '/api';
 
@@ -12,33 +12,26 @@ export class ApiService {
   }
 
   // Auth endpoints
-  public static async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({ email, password }),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {
-      console.warn('Backend API offline, using mock authentication:', e);
+  public static async login(identifier: string, password: string): Promise<{ token: string; user: User }> {
+    const apiUrl =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:8085/api/auth/login'
+        : `${API_BASE_URL}/auth/login`;
+
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: identifier, username: identifier, password }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem('sudoku-auth-token', data.token);
+      return data;
     }
 
-    // Mock Fallback
-    return {
-      token: 'mock-jwt-token-abcdef123456',
-      user: {
-        id: 'usr_001',
-        username: email.split('@')[0] || 'SudokuMaster',
-        email,
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
-        country: 'US',
-        bio: 'Sudoku master & AI enthusiast.',
-        xp: 4250,
-        level: 8,
-        createdAt: new Date().toISOString(),
-      },
-    };
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.message || 'Invalid credentials or wrong password.');
   }
 
   public static async register(
@@ -47,46 +40,43 @@ export class ApiService {
     password: string,
     optionalProfile?: { avatarUrl?: string; country?: string; bio?: string }
   ): Promise<{ token: string; user: User }> {
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({
-          email,
-          username,
-          password,
-          avatarUrl: optionalProfile?.avatarUrl,
-          country: optionalProfile?.country,
-          bio: optionalProfile?.bio,
-        }),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {
-      console.warn('Backend API offline, using mock registration:', e);
+    const apiUrl =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:8085/api/auth/register'
+        : `${API_BASE_URL}/auth/register`;
+
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        username,
+        password,
+        avatarUrl: optionalProfile?.avatarUrl,
+        country: optionalProfile?.country,
+        bio: optionalProfile?.bio,
+      }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem('sudoku-auth-token', data.token);
+      return data;
     }
 
-    return {
-      token: 'mock-jwt-token-newuser',
-      user: {
-        id: `usr_${Date.now()}`,
-        username,
-        email,
-        avatarUrl:
-          optionalProfile?.avatarUrl ||
-          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80',
-        country: optionalProfile?.country || 'US',
-        bio: optionalProfile?.bio || 'Sudoku Master AI Enthusiast!',
-        xp: 100,
-        level: 1,
-        createdAt: new Date().toISOString(),
-      },
-    };
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.message || 'Registration failed. Username or email may be taken.');
   }
 
   // Leaderboards endpoint
   public static async getLeaderboard(timeframe: 'WEEKLY' | 'MONTHLY' | 'ALL_TIME' = 'WEEKLY'): Promise<LeaderboardEntry[]> {
     try {
-      const res = await fetch(`${API_BASE_URL}/leaderboard?timeframe=${timeframe}`, {
+      const apiUrl =
+        window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? `http://localhost:8085/api/leaderboard?timeframe=${timeframe}`
+          : `${API_BASE_URL}/leaderboard?timeframe=${timeframe}`;
+
+      const res = await fetch(apiUrl, {
         headers: this.getHeaders(),
       });
       if (res.ok) return await res.json();

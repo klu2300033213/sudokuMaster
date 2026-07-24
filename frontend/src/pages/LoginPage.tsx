@@ -9,24 +9,29 @@ import { soundManager } from '../utils/audio';
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuthStore();
-  const [email, setEmail] = useState('alex.sudoku@example.com');
-  const [password, setPassword] = useState('password123');
+  const [identifier, setIdentifier] = useState('bhanuprakash');
+  const [password, setPassword] = useState('2236');
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!identifier.trim() || !password.trim()) {
+      setError('Please enter your username/email and password.');
+      return;
+    }
+
     setError('');
     setLoading(true);
     soundManager.playClick();
 
     try {
-      const res = await ApiService.login(email, password);
-      login(email, res.token, res.user);
+      const res = await ApiService.login(identifier.trim(), password);
+      login(identifier.trim(), res.token, res.user);
       navigate('/dashboard');
-    } catch (err) {
-      setError('Invalid email or password.');
+    } catch (err: any) {
+      setError(err.message || 'Invalid credentials. Please check your username and password.');
     } finally {
       setLoading(false);
     }
@@ -44,37 +49,39 @@ export const LoginPage: React.FC = () => {
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-500 to-violet-600 mx-auto flex items-center justify-center font-black text-xl text-white shadow-lg shadow-brand-500/30">
             9
           </div>
-          <h2 className="font-display font-black text-2xl text-white">Welcome Back</h2>
-          <p className="text-xs text-slate-400">Log in to resume your Sudoku games & track stats</p>
+          <h2 className="font-display font-black text-2xl text-slate-900 dark:text-white">Welcome Back</h2>
+          <p className="text-xs text-slate-600 dark:text-slate-400">Log in to resume your Sudoku games & track stats</p>
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{error}</span>
+          <div className="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-700 dark:text-rose-300 text-xs flex items-center space-x-2.5">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-500" />
+            <span className="font-semibold">{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
+          {/* Username / Email */}
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5">Email Address</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+              Username or Email Address
+            </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
-                type="email"
+                type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                placeholder="name@example.com"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
+                placeholder="Username or email"
               />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5">Password</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Password</label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
@@ -82,29 +89,26 @@ export const LoginPage: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
                 placeholder="••••••••"
               />
             </div>
           </div>
 
-          {/* Remember Me & Forgot Password */}
+          {/* Remember Me */}
           <div className="flex items-center justify-between text-xs">
             <button
               type="button"
               onClick={() => setRememberMe(!rememberMe)}
-              className="flex items-center space-x-2 text-slate-400 hover:text-slate-200"
+              className="flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             >
               {rememberMe ? (
-                <CheckSquare className="w-4 h-4 text-brand-400" />
+                <CheckSquare className="w-4 h-4 text-brand-500" />
               ) : (
-                <Square className="w-4 h-4 text-slate-600" />
+                <Square className="w-4 h-4 text-slate-400" />
               )}
               <span>Remember me</span>
             </button>
-            <a href="#" className="text-brand-400 hover:underline">
-              Forgot password?
-            </a>
           </div>
 
           {/* Submit CTA */}
@@ -118,30 +122,10 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        {/* Divider */}
-        <div className="relative flex items-center justify-center my-4">
-          <div className="border-t border-slate-800 w-full" />
-          <span className="bg-slate-950 px-3 text-[10px] font-mono text-slate-500 uppercase absolute">
-            Or continue with
-          </span>
-        </div>
-
-        {/* Google SSO Placeholder */}
-        <button
-          onClick={() => {
-            soundManager.playClick();
-            handleSubmit({ preventDefault: () => {} } as React.FormEvent);
-          }}
-          className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-semibold flex items-center justify-center space-x-2 border border-slate-700"
-        >
-          <Chrome className="w-4 h-4 text-red-400" />
-          <span>Google Account</span>
-        </button>
-
         {/* Footer link */}
-        <p className="text-center text-xs text-slate-400 pt-2">
+        <p className="text-center text-xs text-slate-600 dark:text-slate-400 pt-2">
           Don't have an account?{' '}
-          <Link to="/register" className="text-brand-400 font-semibold hover:underline">
+          <Link to="/register" className="text-brand-500 font-semibold hover:underline">
             Create Account
           </Link>
         </p>

@@ -4,6 +4,7 @@ import com.sudokumaster.model.UserEntity;
 import com.sudokumaster.repository.UserRepository;
 import com.sudokumaster.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -31,32 +32,30 @@ public class AuthController {
         if (identifier == null || identifier.isBlank()) {
             identifier = request.get("username");
         }
-        if (identifier == null || identifier.isBlank()) {
-            identifier = "prakash";
-        }
         String password = request.get("password");
 
-        final String searchKey = identifier;
+        if (identifier == null || identifier.isBlank() || password == null || password.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Username/Email and Password are required."));
+        }
+
+        final String searchKey = identifier.trim();
         UserEntity user = userRepository.findByEmail(searchKey)
                 .orElseGet(() -> userRepository.findByUsername(searchKey).orElse(null));
 
+        // 1. Check if user exists
         if (user == null) {
-            String usernameClean = searchKey.contains("@") ? searchKey.split("@")[0] : searchKey;
-            String emailClean = searchKey.contains("@") ? searchKey : searchKey + "@gmail.com";
-            
-            user = UserEntity.builder()
-                    .email(emailClean)
-                    .username(usernameClean)
-                    .password(passwordEncoder.encode(password != null ? password : "2236"))
-                    .avatarUrl("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80")
-                    .country("IN")
-                    .bio("Sudoku enthusiast & AI speedsolver.")
-                    .xp(500)
-                    .level(3)
-                    .build();
-            userRepository.save(user);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "User account not found. Please register first."));
         }
 
+        // 2. Strict Password Validation via BCrypt
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid credentials. Incorrect password."));
+        }
+
+        // 3. Authentication Successful -> Generate JWT Token
         String token = jwtUtils.generateJwtToken(user.getEmail());
 
         Map<String, Object> response = new HashMap<>();
@@ -71,17 +70,33 @@ public class AuthController {
         String username = request.get("username");
         String password = request.get("password");
 
-        if (email == null || email.isBlank()) {
-            email = (username != null ? username : "prakash") + "@gmail.com";
+        if (username == null || username.isBlank() || password == null || password.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Username and password are required."));
         }
 
+        String cleanUsername = username.trim();
+        String cleanEmail = (email != null && !email.isBlank()) ? email.trim() : cleanUsername + "@gmail.com";
+
+        // Check if user already exists
+        if (userRepository.existsByUsername(cleanUsername)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Username '" + cleanUsername + "' is already registered. Please login."));
+        }
+
+        if (userRepository.existsByEmail(cleanEmail)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Email '" + cleanEmail + "' is already registered. Please login."));
+        }
+
+        // Save new user with BCrypt hashed password
         UserEntity user = UserEntity.builder()
-                .email(email)
-                .username(username != null ? username : "prakash")
-                .password(passwordEncoder.encode(password != null ? password : "2236"))
+                .email(cleanEmail)
+                .username(cleanUsername)
+                .password(passwordEncoder.encode(password))
                 .avatarUrl("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80")
                 .country("IN")
-                .bio("New Sudoku solver!")
+                .bio("Sudoku speedsolver.")
                 .xp(100)
                 .level(1)
                 .build();

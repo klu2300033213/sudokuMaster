@@ -35,7 +35,28 @@
 
 ---
 
-## 🚀 Getting Started
+## 🚂 Railway Deployment (1-Click Deployment)
+
+This repository is **100% Railway Ready** using the multi-stage `Dockerfile` and `railway.json`.
+
+### Deploy to Railway:
+1. Log in to [Railway](https://railway.app/).
+2. Click **New Project** -> **Deploy from GitHub repo**.
+3. Select `klu2300033213/sudokuMaster`.
+4. Add the following **Variables** under the service settings:
+   ```env
+   SPRING_MAIL_HOST=smtp.gmail.com
+   SPRING_MAIL_PORT=587
+   SPRING_MAIL_USERNAME=bhanuprakash.gandham12@gmail.com
+   SPRING_MAIL_PASSWORD=sbijvjhkpfrxznzd
+   SPRING_MAIL_AUTH=true
+   SPRING_MAIL_STARTTLS=true
+   ```
+5. Click **Deploy**. Railway will automatically build the container and generate your live HTTPS domain!
+
+---
+
+## 🚀 Local Development
 
 ### 1. Clone the Repository
 ```bash
@@ -44,7 +65,7 @@ cd sudokuMaster
 ```
 
 ### 2. Environment Setup
-Copy `.env.example` to `.env` in the root, backend, and frontend directories:
+Copy `.env.example` to `.env`:
 
 ```bash
 cp .env.example .env

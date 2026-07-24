@@ -26,8 +26,12 @@ export const SupportForm: React.FC = () => {
     soundManager.playClick();
 
     try {
-      // 1. Try local Spring Boot SMTP endpoint
-      const res = await fetch('http://localhost:8085/api/support/send', {
+      const apiUrl =
+        window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:8085/api/support/send'
+          : '/api/support/send';
+
+      const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, category, message }),

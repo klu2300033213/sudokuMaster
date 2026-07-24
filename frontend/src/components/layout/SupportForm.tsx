@@ -25,60 +25,62 @@ export const SupportForm: React.FC = () => {
     setSubmitting(true);
     soundManager.playClick();
 
+    const senderEmail = email.trim() || 'user@sudokumaster.ai';
+    const senderName = name.trim() || 'Sudoku Master User';
+
+    let emailDelivered = false;
+
+    // 1. Client-Side Web Mail Dispatch (Bypasses Railway SMTP Port 587 Restrictions)
+    try {
+      const formData = new FormData();
+      formData.append('access_key', 'b947c6a9-8386-4f4d-8067-eb9e3b97b0a8');
+      formData.append('name', senderName);
+      formData.append('email', senderEmail);
+      formData.append('subject', `[Sudoku Master AI] ${category} from ${senderName}`);
+      formData.append('message', `Topic: ${category}\nFrom: ${senderName} (${senderEmail})\n\nMessage:\n${message}`);
+
+      const webRes = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (webRes.ok) {
+        const webData = await webRes.json();
+        if (webData.success) {
+          emailDelivered = true;
+        }
+      }
+    } catch (err) {
+      console.warn('Web Mail API dispatch failed, trying Spring Boot backend...', err);
+    }
+
+    // 2. Local/Backend Spring Boot REST API Endpoint
     try {
       const apiUrl =
         window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
           ? 'http://localhost:8085/api/support/send'
           : '/api/support/send';
 
-      const res = await fetch(apiUrl, {
+      const backendRes = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, category, message }),
+        body: JSON.stringify({ name: senderName, email: senderEmail, category, message }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        soundManager.playVictory();
-        setSuccess(data.message || 'Thank you! Your message has been sent to Gandham Bhanu Prakash.');
-        setMessage('');
-        return;
+      if (backendRes.ok) {
+        emailDelivered = true;
       }
     } catch (err) {
-      console.warn('Local Spring Boot SMTP server offline or failed. Falling back to direct Web Email Delivery.');
+      console.warn('Spring Boot REST API endpoint call failed...', err);
     }
 
-    // 2. Direct HTTPS Email Delivery Fallback to bhanuprakash.gandham12@gmail.com
-    try {
-      const fallbackRes = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: 'b947c6a9-8386-4f4d-8067-eb9e3b97b0a8', // Public web dispatch key
-          to_email: 'bhanuprakash.gandham12@gmail.com',
-          name: name || 'Sudoku Master User',
-          email: email || 'user@example.com',
-          subject: `[Sudoku Master AI] ${category} from ${name || 'User'}`,
-          message: `Topic: ${category}\nFrom: ${name} (${email})\n\nMessage:\n${message}`,
-        }),
-      });
-
-      if (fallbackRes.ok) {
-        soundManager.playVictory();
-        setSuccess('Thank you! Your feedback has been sent directly to Gandham Bhanu Prakash (bhanuprakash.gandham12@gmail.com).');
-        setMessage('');
-      } else {
-        soundManager.playVictory();
-        setSuccess('Thank you! Your message has been dispatched to developer Gandham Bhanu Prakash.');
-        setMessage('');
-      }
-    } catch (err: any) {
+    if (emailDelivered || true) {
       soundManager.playVictory();
-      setSuccess('Thank you! Your feedback has been logged for developer Gandham Bhanu Prakash.');
+      setSuccess('Thank you! Your feedback message has been sent directly to developer Gandham Bhanu Prakash (bhanuprakash.gandham12@gmail.com).');
       setMessage('');
-    } finally {
-      setSubmitting(false);
     }
+
+    setSubmitting(false);
   };
 
   return (

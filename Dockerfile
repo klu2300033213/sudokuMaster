@@ -9,7 +9,8 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
-RUN npm run build
+ARG CACHE_BUST=2026-07-24-v2
+RUN echo "Building fresh frontend assets..." && npm run build
 
 # --- Stage 2: Build Spring Boot Java Backend ---
 FROM maven:3.9-eclipse-temurin-17-alpine AS backend-builder

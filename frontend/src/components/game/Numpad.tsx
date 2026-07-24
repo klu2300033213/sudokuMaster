@@ -1,8 +1,7 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useGameStore } from '../../store/useGameStore';
 
-export const Numpad: React.FC = () => {
+export const Numpad: React.FC = React.memo(() => {
   const { grid, inputNumber, isPencilMode } = useGameStore();
 
   // Count instances of each number (1-9) in grid
@@ -17,20 +16,18 @@ export const Numpad: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-9 gap-1 sm:gap-2 max-w-[540px] w-full mx-auto my-4 px-1">
+    <div className="grid grid-cols-9 gap-1 sm:gap-2 max-w-[540px] w-full mx-auto my-4 px-1 touch-manipulation">
       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
         const remaining = 9 - (counts[num] || 0);
         const isCompleted = remaining <= 0;
         const isDisabled = !isPencilMode && isCompleted;
 
         return (
-          <motion.button
+          <button
             key={num}
-            whileHover={{ scale: isDisabled ? 1 : 1.08 }}
-            whileTap={{ scale: isDisabled ? 1 : 0.92 }}
             onClick={() => (!isDisabled || isPencilMode) && inputNumber(num)}
             disabled={isDisabled}
-            className={`relative flex flex-col items-center justify-center py-2 sm:py-3.5 rounded-xl font-display font-bold transition-all shadow-sm ${
+            className={`relative flex flex-col items-center justify-center py-2 sm:py-3.5 rounded-xl font-display font-bold transition-all active:scale-95 touch-manipulation shadow-sm select-none ${
               isDisabled
                 ? 'bg-slate-100 dark:bg-slate-900 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-800 cursor-not-allowed opacity-50'
                 : isPencilMode
@@ -46,9 +43,9 @@ export const Numpad: React.FC = () => {
             >
               {remaining > 0 ? `${remaining} left` : '✓'}
             </span>
-          </motion.button>
+          </button>
         );
       })}
     </div>
   );
-};
+});

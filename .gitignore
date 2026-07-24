@@ -1,0 +1,30 @@
+# Environment & Secrets
+.env
+*.env
+backend/.env
+frontend/.env
+.env.local
+.env.*.local
+
+# Node.js & Frontend dependencies
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# Java & Maven Build Artifacts
+backend/target/
+backend/.mvn/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE & OS Files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

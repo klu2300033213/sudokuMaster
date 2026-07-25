@@ -51,8 +51,8 @@ export const SudokuBoard: React.FC = React.memo(() => {
   if (grid.length === 0) return null;
 
   return (
-    <div className="glass-panel p-1.5 sm:p-3 rounded-2xl shadow-2xl border-2 border-slate-200 dark:border-slate-700/60 max-w-[98vw] xs:max-w-[480px] sm:max-w-[540px] w-full mx-auto touch-manipulation">
-      <div className="grid grid-cols-9 border-2 border-slate-700/80 rounded-xl overflow-hidden bg-slate-950/80">
+    <div className="p-1.5 sm:p-3 rounded-2xl shadow-2xl border-2 border-slate-200 dark:border-slate-800 bg-slate-900 dark:bg-slate-900 max-w-[98vw] xs:max-w-[480px] sm:max-w-[540px] w-full mx-auto touch-manipulation">
+      <div className="grid grid-cols-9 border-2 border-slate-700/80 rounded-xl overflow-hidden bg-slate-950">
         {grid.map((row, rIdx) =>
           row.map((cell, cIdx) => {
             const isHintTarget =

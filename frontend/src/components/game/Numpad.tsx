@@ -32,7 +32,7 @@ export const Numpad: React.FC = React.memo(() => {
                 ? 'bg-slate-100 dark:bg-slate-900 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-800 cursor-not-allowed opacity-50'
                 : isPencilMode
                 ? 'bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-brand-300 border border-indigo-200 dark:border-brand-500/40 font-black'
-                : 'bg-white dark:bg-gradient-to-b dark:from-slate-800 dark:to-slate-900 hover:bg-brand-500 hover:text-white dark:hover:from-brand-600 dark:hover:to-indigo-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 hover:border-brand-400 font-black'
+                : 'bg-white dark:bg-slate-800 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-600 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 hover:border-brand-400 font-black'
             }`}
           >
             <span className="text-lg sm:text-2xl font-black leading-none">{num}</span>

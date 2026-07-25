@@ -18,24 +18,24 @@ export const CellComponent = React.memo<CellComponentProps>(
     const isRightThick = (col + 1) % 3 === 0 && col !== 8;
     const isBottomThick = (row + 1) % 3 === 0 && row !== 8;
 
-    // Background styling calculation
-    let bgClass = 'bg-slate-900/60 dark:bg-slate-900/60 hover:bg-slate-200/60 dark:hover:bg-slate-800/80';
+    // Background styling calculation - Solid non-transparent colors to prevent Android GPU texture bleeding
+    let bgClass = 'bg-slate-900 dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-800';
 
     if (isSelected) {
-      bgClass = 'bg-indigo-200/90 dark:bg-brand-500/35 ring-2 ring-brand-500 dark:ring-brand-400 z-10';
+      bgClass = 'bg-brand-600 dark:bg-brand-600 ring-2 ring-brand-400 text-white z-10';
     } else if (isHintTarget) {
-      bgClass = 'bg-amber-200/90 dark:bg-amber-500/40 ring-2 ring-amber-500 dark:ring-amber-400 animate-pulse z-10';
+      bgClass = 'bg-amber-600 dark:bg-amber-600 ring-2 ring-amber-400 text-white animate-pulse z-10';
     } else if (isSameNumber) {
-      bgClass = 'bg-indigo-100/90 dark:bg-indigo-500/35 ring-1 ring-indigo-400/80';
+      bgClass = 'bg-indigo-800 dark:bg-indigo-900 ring-1 ring-indigo-500';
     } else if (isPeer) {
-      bgClass = 'bg-slate-100/90 dark:bg-slate-800/70';
+      bgClass = 'bg-slate-800/90 dark:bg-slate-800/90';
     }
 
     return (
       <div
         onClick={() => onSelect(row, col)}
         className={clsx(
-          'sudoku-cell relative flex items-center justify-center border border-slate-300 dark:border-slate-800/80 text-center font-display cursor-pointer transition-colors duration-100 aspect-square select-none touch-manipulation',
+          'sudoku-cell relative flex items-center justify-center border border-slate-700/70 text-center font-display cursor-pointer aspect-square select-none touch-manipulation',
           isRightThick && 'border-right-thick',
           isBottomThick && 'border-bottom-thick',
           bgClass
@@ -45,22 +45,22 @@ export const CellComponent = React.memo<CellComponentProps>(
         {value !== 0 ? (
           <span
             className={clsx(
-              'text-xl sm:text-2xl lg:text-3xl transition-transform duration-100 will-change-transform',
+              'text-xl sm:text-2xl lg:text-3xl leading-none',
               isGiven
-                ? 'text-slate-900 dark:text-slate-100 font-black'
+                ? 'text-slate-100 dark:text-slate-100 font-black'
                 : isError
-                ? 'text-rose-600 dark:text-red-400 font-black animate-shake'
-                : 'text-brand-600 dark:text-brand-400 font-extrabold'
+                ? 'text-rose-400 dark:text-red-400 font-black animate-shake'
+                : 'text-brand-300 dark:text-brand-300 font-extrabold'
             )}
           >
             {value}
           </span>
         ) : showPencilNotes && notes.length > 0 ? (
           /* 3x3 Mini Pencil Marks Grid */
-          <div className="grid grid-cols-3 grid-rows-3 w-full h-full p-0.5 text-[9px] sm:text-[10px] leading-none text-slate-700 dark:text-slate-300 font-mono select-none pointer-events-none font-bold">
+          <div className="grid grid-cols-3 grid-rows-3 w-full h-full p-0.5 text-[9px] sm:text-[10px] leading-none text-slate-300 font-mono select-none pointer-events-none font-bold">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <div key={n} className="flex items-center justify-center">
-                {notes.includes(n) ? <span className="text-indigo-600 dark:text-brand-300 font-extrabold">{n}</span> : null}
+                {notes.includes(n) ? <span className="text-brand-300 font-extrabold">{n}</span> : null}
               </div>
             ))}
           </div>

@@ -56,9 +56,9 @@ export const PlayPage: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-4xl mx-auto px-2 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6">
       {/* Top Header: Difficulty & Game Mode Selectors */}
-      <div className="glass-panel p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+      <div className="p-3.5 rounded-2xl border border-slate-700/80 bg-slate-900 dark:bg-slate-900 flex flex-col md:flex-row items-center justify-between gap-3 shadow-md">
         {/* Difficulty Tabs */}
         <div className="flex items-center space-x-1 overflow-x-auto max-w-full pb-1 md:pb-0">
           {difficulties.map((diff) => (
@@ -68,10 +68,10 @@ export const PlayPage: React.FC = () => {
                 soundManager.playClick();
                 startNewGame(diff, gameMode);
               }}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
                 difficulty === diff
                   ? 'bg-brand-500 text-white shadow-md shadow-brand-500/30'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
               {diff}
@@ -80,7 +80,7 @@ export const PlayPage: React.FC = () => {
         </div>
 
         {/* Mode Selector Tabs */}
-        <div className="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div className="flex items-center space-x-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800">
           {modes.map((m) => (
             <button
               key={m.mode}
@@ -90,8 +90,8 @@ export const PlayPage: React.FC = () => {
               }}
               className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all ${
                 gameMode === m.mode
-                  ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-300 border border-brand-300 dark:border-brand-500/40 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  ? 'bg-slate-800 text-brand-300 border border-brand-500/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               {m.icon}
@@ -102,30 +102,30 @@ export const PlayPage: React.FC = () => {
       </div>
 
       {/* Game Status Bar: Timer, Mistakes, Controls */}
-      <div className="flex items-center justify-between px-2 text-xs font-mono font-bold text-slate-800 dark:text-slate-300">
-        <div className="flex items-center space-x-2 bg-white dark:bg-slate-900/80 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <Clock className="w-4 h-4 text-brand-600 dark:text-brand-400" />
-          <span className="font-mono font-black text-slate-900 dark:text-slate-100">{formatTime(timerSeconds)}</span>
+      <div className="flex items-center justify-between px-1 text-xs font-mono font-bold text-slate-300">
+        <div className="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800 shadow-sm">
+          <Clock className="w-4 h-4 text-brand-400" />
+          <span className="font-mono font-black text-slate-100">{formatTime(timerSeconds)}</span>
         </div>
 
-        <div className="flex items-center space-x-2 bg-white dark:bg-slate-900/80 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <AlertCircle className={`w-4 h-4 ${mistakesCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'}`} />
-          <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
-            Mistakes: <strong className={mistakesCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-slate-100'}>{mistakesCount}</strong>
+        <div className="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800 shadow-sm">
+          <AlertCircle className={`w-4 h-4 ${mistakesCount > 0 ? 'text-rose-400' : 'text-slate-400'}`} />
+          <span className="font-mono font-bold text-slate-300">
+            Mistakes: <strong className={mistakesCount > 0 ? 'text-rose-400' : 'text-slate-100'}>{mistakesCount}</strong>
           </span>
         </div>
 
         <div className="flex items-center space-x-2">
           <button
             onClick={restartGame}
-            className="p-2 rounded-xl bg-white dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm"
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 shadow-sm"
             title="Restart Game"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
           <button
             onClick={togglePause}
-            className="p-2 rounded-xl bg-white dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm"
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 shadow-sm"
             title="Pause Game"
           >
             <Pause className="w-4 h-4" />

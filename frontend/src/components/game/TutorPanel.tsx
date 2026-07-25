@@ -12,28 +12,24 @@ export const TutorPanel: React.FC = () => {
 
   const typeConfig = {
     info: {
-      bg: 'bg-brand-500/15 border-brand-500/30',
-      icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />,
+      bg: 'bg-slate-900 border-brand-500/40 text-slate-100',
       badge: 'Correct Move',
-      badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
     },
     warning: {
-      bg: 'bg-rose-500/15 border-rose-500/30',
-      icon: <AlertTriangle className="w-5 h-5 text-rose-400" />,
+      bg: 'bg-slate-900 border-rose-500/40 text-slate-100',
       badge: 'Mistake Warning',
-      badgeBg: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+      badgeBg: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
     },
     tip: {
-      bg: 'bg-indigo-500/15 border-indigo-500/30',
-      icon: <Lightbulb className="w-5 h-5 text-amber-400" />,
+      bg: 'bg-slate-900 border-indigo-500/40 text-slate-100',
       badge: 'Tutor Tip',
-      badgeBg: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+      badgeBg: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
     },
     technique: {
-      bg: 'bg-violet-500/15 border-violet-500/30',
-      icon: <Sparkles className="w-5 h-5 text-violet-400" />,
+      bg: 'bg-slate-900 border-violet-500/40 text-slate-100',
       badge: 'Technique Unlocked',
-      badgeBg: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+      badgeBg: 'bg-violet-500/20 text-violet-300 border-violet-500/40',
     },
   };
 
@@ -42,26 +38,26 @@ export const TutorPanel: React.FC = () => {
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 10 }}
-        className={`glass-panel p-4 rounded-2xl border ${currentConfig.bg} max-w-[540px] w-full mx-auto my-3 relative shadow-xl`}
+        exit={{ opacity: 0, y: 5 }}
+        className={`p-3.5 sm:p-4 rounded-2xl border ${currentConfig.bg} max-w-[540px] w-full mx-auto my-2 relative shadow-lg bg-slate-900 dark:bg-slate-900 text-slate-100`}
       >
         <button
           onClick={clearTutorExplanation}
-          className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors"
+          className="absolute top-2.5 right-2.5 p-1 rounded-lg text-slate-400 hover:text-white transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
 
         <div className="flex items-start space-x-3">
           {/* AI Avatar */}
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-500 to-violet-600 flex items-center justify-center text-white flex-shrink-0 shadow-md">
-            <Bot className="w-5 h-5" />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-500 to-violet-600 flex items-center justify-center text-white flex-shrink-0 shadow-md">
+            <Bot className="w-4 h-4" />
           </div>
 
-          <div className="flex-1">
-            <div className="flex items-center space-x-2 mb-1">
+          <div className="flex-1 pr-4">
+            <div className="flex flex-wrap items-center gap-1.5 mb-1">
               <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${currentConfig.badgeBg}`}>
                 {currentConfig.badge}
               </span>
@@ -72,14 +68,14 @@ export const TutorPanel: React.FC = () => {
               )}
             </div>
 
-            <h4 className="font-display font-bold text-sm text-slate-100 flex items-center space-x-1.5">
+            <h4 className="font-display font-bold text-xs sm:text-sm text-slate-100 flex items-center space-x-1.5">
               <span>{title}</span>
             </h4>
 
-            <p className="text-xs text-slate-300 mt-1 leading-relaxed">{message}</p>
+            <p className="text-[11px] sm:text-xs text-slate-300 mt-1 leading-relaxed">{message}</p>
 
             {suggestedValue && (
-              <div className="mt-2.5 pt-2 border-t border-slate-700/50 flex items-center justify-between text-xs">
+              <div className="mt-2 pt-1.5 border-t border-slate-800 flex items-center justify-between text-[11px]">
                 <span className="text-slate-400">AI Suggested Solution Value:</span>
                 <span className="font-mono font-bold text-brand-400 bg-brand-500/20 px-2 py-0.5 rounded border border-brand-500/40">
                   Digit {suggestedValue}
